@@ -305,7 +305,7 @@ export default function Home() {
                 <div>
                   <Image src={(session?.user as any)?.image} className="rounded-full" alt="hello" width={36} height={36} />
                 </div>
-                <button className={`bg-white text-black rounded px-2 py-1 rounded-full`} onClick={() => signIn("github")}>Github Login</button>
+                <button className={`bg-white text-black rounded px- py-1 rounded-full`} onClick={() => signIn("github")}>Github Login</button>
               </div>
           </div>
       </div>
