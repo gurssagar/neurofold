@@ -1,12 +1,11 @@
 
-import { pgTable, serial, text, varchar } from "drizzle-orm/pg-core";
+import { pgTable, serial, text, varchar ,integer} from "drizzle-orm/pg-core";
 
 export const users = pgTable('users', {
-  username: serial('id').primaryKey(),
-  name: text('full_name'),
-  image: varchar('name', { length: 256 }),
+  username: varchar('username',{ length: 256 }).primaryKey(),
+  name: text('name'),
+  image: varchar('image', { length: 256 }),
   email: varchar('email', { length: 256 }).notNull(),
-
-  
+  coins: integer('coins').default(5),
 });
         

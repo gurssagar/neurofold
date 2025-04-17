@@ -2,8 +2,9 @@
 "use client"
 import Image from "next/image";
 import { signIn } from "next-auth/react"
+import { signOut } from "next-auth/react";
 import { useSession } from "next-auth/react";
-import { useState, useRef } from "react";
+import { useState, useRef ,useEffect} from "react";
 import { Search, Dna, Database, ArrowRight, FlaskConical, Loader2, Microscope, Atom, Beaker, ScrollText, Scale, Droplets, Gauge, Pill, Binary } from "lucide-react";
 import { motion } from "framer-motion";
 import { Input } from "@/components/ui/input";
@@ -17,6 +18,7 @@ import ReactMarkdown from 'react-markdown'
 export default function Home() {
   const { data: session } = useSession();
   console.log(session)
+  
   const [query, setQuery] = useState("");
   const [protein, setProtein] = useState<ProteinDetails>();
   const [drugDiscoveryResult, setDrugDiscoveryResult] = useState<DrugDiscoveryResult | undefined>();
@@ -28,6 +30,32 @@ export default function Home() {
 
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
+  const User = async () => {
+    try {
+      if (!session?.user) {
+        console.log("No user session available");
+        return;
+      }
+      
+      const response = await fetch('/api/User', {
+        method: 'POST',
+        body: JSON.stringify({
+          email: session.user.email,
+          name: session.user.name,
+          image: session.user.image,
+          username: (session.user as any)?.username || "user" + Math.floor(Math.random() * 10000)
+        }),
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      const data = await response.json();
+      console.log("User data saved:", data);
+    } catch (error) {
+      console.error("Error saving user data:", error);
+    }
+  }
   const fetchData = async () => {
     if (!query) return;
     
@@ -47,6 +75,47 @@ export default function Home() {
     }
     setLoading(false);
   };
+  const [userData, setUserData] = useState<any[]>([]);
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const response = await fetch("/api/User", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json"
+          },
+        });
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        console.log("Users data:", data.users);
+        setUserData(data.users || []);
+      } catch (error) {
+        console.error("Error fetching users:", error);
+      }
+    };
+    
+    fetchUser();
+  }, []);
+
+  const handleGithubLogin = async () => {
+    try {
+      await signIn("github");
+      // User data will be saved after successful login via useEffect
+    } catch (error) {
+      console.error("Error during GitHub login:", error);
+    }
+  };
+  
+  // Effect to save user data when session becomes available
+  useEffect(() => {
+    if (session?.user) {
+      User();
+    }
+  }, [session]);
 
   const handleDrugDiscovery = async () => {
     setInitiatingDiscovery(true);
@@ -95,7 +164,7 @@ export default function Home() {
     }
     setInitiatingDiscovery(false);
   };
-
+  console.log(userData,"test")
   const renderResults = () => {
     console.log(searchMode)
     if (searchMode == 'protein' && !proteinDrugDiscoveryResult) return null;
@@ -302,10 +371,31 @@ export default function Home() {
               </h1>
               </div>
               <div className="flex gap-4">
+                {userData.length > 0 && userData.some(user => user.username === (session?.user as any)?.username) ? (
+                  <div className="text-white my-auto">
+                    Credits Left: {userData.find(user => user.username === (session?.user as any)?.username)?.coins || 0}
+                  </div>
+                ) : (
+                  <></>
+                )}
                 <div>
-                  <Image src={(session?.user as any)?.image} className="rounded-full" alt="hello" width={36} height={36} />
+                  {session?.user?.image ? (
+                    <>
+                      <Image src={(session?.user as any)?.image} className="rounded-full" alt="hello" width={36} height={36} />
+                    </>
+                  ) : (
+                    <></>
+                  )}
                 </div>
-                <button className={`bg-white text-black rounded px- py-1 rounded-full`} onClick={() => signIn("github")}>Github Login</button>
+                {session ? (
+                  <>
+                    <button className={`bg-white text-black rounded px-4 hover:scale-1.25 py-1 rounded-full`} onClick={() => {signOut()}}>Log Out</button>
+                  </>
+                ) : (
+                  <>
+                    <button className={`bg-white text-black rounded px-4 hover:scale-1.25 py-1 rounded-full`} onClick={handleGithubLogin}>Github Login</button>
+                  </>
+                )}
               </div>
           </div>
       </div>
@@ -333,7 +423,8 @@ export default function Home() {
             Enter a protein name or UniProt ID to explore detailed molecular information and structural insights.
           </p>
         </motion.div>
-
+        {session?.user?
+        <>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -391,6 +482,13 @@ export default function Home() {
             </TabsContent>
           </Tabs>
         </motion.div>
+        </>:
+        <>
+        <div onClick={() => {handleGithubLogin()}} className="hover:scale-1.05 text-center mx-auto w-40 text-white bg-black px-4 rounded-xl py-2">
+              Sign Up Now
+        </div>
+        </>}
+        
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -547,5 +645,4 @@ export default function Home() {
       </div>
     </main>
     </>
-  );
-}
+  );}
