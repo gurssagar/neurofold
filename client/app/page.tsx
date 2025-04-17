@@ -1,9 +1,8 @@
 "use client";
 "use client"
-
+import Image from "next/image";
 import { signIn } from "next-auth/react"
- 
-
+import { useSession } from "next-auth/react";
 import { useState, useRef } from "react";
 import { Search, Dna, Database, ArrowRight, FlaskConical, Loader2, Microscope, Atom, Beaker, ScrollText, Scale, Droplets, Gauge, Pill, Binary } from "lucide-react";
 import { motion } from "framer-motion";
@@ -16,6 +15,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ReactMarkdown from 'react-markdown'
 
 export default function Home() {
+  const { data: session } = useSession();
+  console.log(session)
   const [query, setQuery] = useState("");
   const [protein, setProtein] = useState<ProteinDetails>();
   const [drugDiscoveryResult, setDrugDiscoveryResult] = useState<DrugDiscoveryResult | undefined>();
@@ -300,7 +301,10 @@ export default function Home() {
                   NEUROFOLD
               </h1>
               </div>
-              <div>
+              <div className="flex gap-4">
+                <div>
+                  <Image src={(session?.user as any)?.image} className="rounded-full" alt="hello" width={36} height={36} />
+                </div>
                 <button className={`bg-white text-black rounded px-2 py-1 rounded-full`} onClick={() => signIn("github")}>Github Login</button>
               </div>
           </div>

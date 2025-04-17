@@ -27,13 +27,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         token.email = profile?.email;
       }
       return token;
-    },
-    async redirect({ url, baseUrl }) {
-      // Redirect to /signup after successful authentication
-      if (url === baseUrl+"/Login") {
-        return `${baseUrl}/Signup`;
-      }
-      return url;
     }
   }
 });
