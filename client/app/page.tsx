@@ -1,4 +1,8 @@
 "use client";
+"use client"
+
+import { signIn } from "next-auth/react"
+ 
 
 import { useState, useRef } from "react";
 import { Search, Dna, Database, ArrowRight, FlaskConical, Loader2, Microscope, Atom, Beaker, ScrollText, Scale, Droplets, Gauge, Pill, Binary } from "lucide-react";
@@ -48,7 +52,7 @@ export default function Home() {
     try {
       console.log(protein?.primaryAccession)
       console.log(query)
-      const response = await fetch(`${apiUrl}/predict`, {
+      const response = await fetch(`http://${apiUrl}/predict`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -71,7 +75,7 @@ export default function Home() {
     try {
       console.log(protein?.primaryAccession)
       console.log(query)
-      const response = await fetch(`${apiUrl}/discover`, {
+      const response = await fetch(`http://${apiUrl}/discover`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -157,6 +161,7 @@ export default function Home() {
     } else {
       return (
         <>
+        
           <div className="flex items-center gap-4 mb-6">
             <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
               <FlaskConical className="h-6 w-6 text-primary" />
@@ -277,6 +282,29 @@ export default function Home() {
   };
 
   return (
+    <>
+    <div className="mx-auto p-5 mt-10 w-[80%] bg-black rounded-full">
+          <div className="flex justify-between">
+              <div  className="flex">
+                <div>
+                <div className="flex justify-center ">
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                >
+                <Dna className="h-8 w-8 text-primary text-white " />
+                </motion.div>
+              </div>
+                </div>
+              <h1 className="text-xl font-bold  text-white">
+                  NEUROFOLD
+              </h1>
+              </div>
+              <div>
+                <button className={`bg-white text-black rounded px-2 py-1 rounded-full`} onClick={() => signIn("github")}>Github Login</button>
+              </div>
+          </div>
+      </div>
     <main className="min-h-screen bg-gradient-to-b from-background to-secondary">
       <div className="container mx-auto px-4 py-16">
         <motion.div
@@ -514,5 +542,6 @@ export default function Home() {
         )}
       </div>
     </main>
+    </>
   );
 }

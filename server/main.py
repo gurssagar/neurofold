@@ -88,7 +88,8 @@ def generate_heatmap(protein_grad, drug_grad):
 app = FastAPI()
 
 origins = [
-    "https://neuro-fold.vercel.app"
+    "https://neuro-fold.vercel.app",
+    "http://localhost:3000",
 ]
 
 app.add_middleware(
