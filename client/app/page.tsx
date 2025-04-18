@@ -146,7 +146,7 @@ export default function Home() {
         })
       }).then((res) => {console.log(res)});
       
-      const response = await fetch(`https://${apiUrl}/predict`, {
+      const response = await fetch(`https://neurofold.onrender.com/predict`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -188,7 +188,7 @@ export default function Home() {
     try {
       console.log(protein?.primaryAccession)
       console.log(query)
-      const response = await fetch(`https://${apiUrl}/discover`, {
+      const response = await fetch(`https://neurofold.onrender.com/discover`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
