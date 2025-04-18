@@ -18,7 +18,7 @@ import ReactMarkdown from 'react-markdown'
 export default function Home() {
   const { data: session } = useSession();
   console.log(session)
-  
+  const [showModal, setShowModal] = useState(false);
   const [query, setQuery] = useState("");
   const [protein, setProtein] = useState<ProteinDetails>();
   const [drugDiscoveryResult, setDrugDiscoveryResult] = useState<DrugDiscoveryResult | undefined>();
@@ -111,6 +111,9 @@ export default function Home() {
     }
   };
   
+
+  const currentUser = userData.find(user => user.username === (session?.user as any)?.username);
+
   // Effect to save user data when session becomes available
   useEffect(() => {
     if (session?.user) {
@@ -394,6 +397,64 @@ export default function Home() {
 
   return (
     <>
+    {showModal?
+    <>
+    <div className="z-50 fixed top-[10%] rounded-xl left-[calc(50%_-_30em)] w-[60em] bg-black ">
+      <div className="rounded-3xl h-[30em] bg-[#0F0F11] text-white py-20 px-4 relative">
+        {/* Close button added to top-left */}
+        <button 
+          className="absolute top-4 left-4 bg-gray-800 hover:bg-gray-700 text-white rounded-full p-2 transition-colors"
+          onClick={() => {setShowModal(false)}}
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+        
+        <h2 className="text-4xl font-bold text-center mb-4">
+          Simple, transparent pricing
+        </h2>
+        <p className="text-center text-gray-400 mb-10">
+          Unlock all features including unlimited posts for your blog.
+        </p>
+
+        <div className="z-50 max-w-4xl mx-auto grid grid-cols-1 gap-8">
+          {/* Pricing Card */}
+          <div
+            className="bg-[#131316] p-8 rounded-xl border border-gray-800 shadow-lg flex justify-between"
+          >
+            <div>
+              <h3 className="text-2xl font-semibold mb-6">
+                What's included in the PRO plan
+              </h3>
+              <ul className="space-y-3 text-gray-300">
+                <li>✓ 200 Coins</li>
+                <li>✓ Customized Support</li>
+                <li>✓ Access to Beta Versions</li>
+              </ul>
+            </div>
+
+            <div className="mt-10 text-center">
+              <div className="text-5xl font-bold mb-2">$19</div>
+              <div className="text-gray-400 mb-6">Billed Monthly</div>
+              <a href="https://rzp.io/rzp/2fuBHKS">
+                  <button className="bg-white text-black font-semibold py-2 px-6 rounded-lg hover:bg-gray-100 transition">
+                      Get Started
+                  </button>
+              </a>
+              
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    </>:
+    <>
+    </>
+
+    }
+    
     <div className="mx-auto p-5 mt-10 w-[80%] bg-black rounded-full">
           <div className="flex justify-between">
               <div  className="flex">
@@ -491,6 +552,17 @@ export default function Home() {
                   onChange={(e) => setQuery(e.target.value)}
                   className="text-lg"
                 />
+                {currentUser?.coins==0?<>
+                  <Button onClick={() => setShowModal(true)} disabled={loading}>
+                  {loading ? (
+                    "Searching..."
+                  ) : (
+                    <>
+                      Search <ArrowRight className="ml-2 h-4 w-4" />
+                    </>
+                  )}
+                </Button>
+                </>:<>
                 <Button onClick={() => fetchData()} disabled={loading}>
                   {loading ? (
                     "Searching..."
@@ -500,6 +572,8 @@ export default function Home() {
                     </>
                   )}
                 </Button>
+                </>}
+                
               </div>
             </TabsContent>
             <TabsContent value="drug" className="mt-4">
@@ -510,6 +584,17 @@ export default function Home() {
                   onChange={(e) => setQuery(e.target.value)}
                   className="text-lg"
                 />
+                {currentUser?.coins==0?<>
+                  <Button onClick={() => setShowModal(true)} disabled={loading}>
+                  {loading ? (
+                    "Searching..."
+                  ) : (
+                    <>
+                      Search <ArrowRight className="ml-2 h-4 w-4" />
+                    </>
+                  )}
+                </Button>
+                </>:<>
                 <Button onClick={() => fetchData()} disabled={loading}>
                   {loading ? (
                     "Searching..."
@@ -519,6 +604,7 @@ export default function Home() {
                     </>
                   )}
                 </Button>
+                </>}
               </div>
             </TabsContent>
           </Tabs>
