@@ -84,6 +84,7 @@ export default function Home() {
           headers: {
             "Content-Type": "application/json"
           },
+          
         });
         
         if (!response.ok) {
@@ -120,8 +121,28 @@ export default function Home() {
   const handleDrugDiscovery = async () => {
     setInitiatingDiscovery(true);
     try {
+      const currentUser = userData.find(user => user.username === (session?.user as any)?.username);
+      if (!currentUser || currentUser.coins <= 0) {
+        alert("You don't have enough credits to perform this action.");
+        setInitiatingDiscovery(false);
+        return;
+      }
+      
+
+
       console.log(protein?.primaryAccession)
       console.log(query)
+      await fetch(`/api/User`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          username: (session?.user as any)?.username,
+          coins: (currentUser.coins - 1)
+        })
+      }).then((res) => {console.log(res)});
+      
       const response = await fetch(`http://${apiUrl}/predict`, {
         method: "POST",
         headers: {
@@ -141,6 +162,25 @@ export default function Home() {
   };
 
   const handleProteinDrugDiscovery = async () => {
+
+    const currentUser = userData.find(user => user.username === (session?.user as any)?.username);
+      if (!currentUser || currentUser.coins <= 0) {
+        alert("You don't have enough credits to perform this action.");
+        setInitiatingDiscovery(false);
+        return;
+      }
+      await fetch(`/api/User`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          username: (session?.user as any)?.username,
+          coins: (currentUser.coins - 1)
+        })
+      }).then((res) => {console.log(res)});
+
+
     setInitiatingDiscovery(true);
     try {
       console.log(protein?.primaryAccession)
@@ -172,7 +212,8 @@ export default function Home() {
 
     if (searchMode === 'protein') {
       return (
-        <>
+        
+        <>        
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-6">
             {proteinDrugDiscoveryResult?.top_candidates.map((candidate, index) => (
               <div key={index} className="space-y-6">
